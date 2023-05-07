@@ -1,0 +1,135 @@
+services:
+  primarydb: 
+    image: mysql:8.0
+    container_name: primarydb_container
+    command: 
+    - "--default-authentication-plugin=mysql_native_password"
+    - "--local-infile=1"
+    restart: always
+    volumes: 
+      # Copy Dataset
+      - ./dataset/Posts.xml:/var/lib/mysql-files/dataset/Posts.xml
+      # Run SQL file on init
+      - ./database/primary.sql:/docker-entrypoint-initdb.d/0_init.sql
+      # Persist data
+      - $HOME/databaseP:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: primarydb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_TCP_PORT: 3306
+      SERVICE_NAME: primarydb
+    networks:
+      - dbnet
+  shard0db: 
+    image: mysql:8.0
+    container_name: shard0_container
+    command: 
+    - "--default-authentication-plugin=mysql_native_password"
+    - "--local-infile=1"
+    restart: always
+    volumes: 
+      # Copy Dataset
+      - ./dataset/Posts.xml:/var/lib/mysql-files/dataset/Posts.xml
+      # Run SQL file on init
+      - ./database/shard0.sql:/docker-entrypoint-initdb.d/0_init.sql
+      # Persist data
+      - $HOME/databaseS0:/var/lib/mysql
+    ports:
+      - 4000:4000
+    environment:
+      MYSQL_DATABASE: shard0db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_TCP_PORT: 4000
+      SERVICE_NAME: shard0db
+    networks:
+      - dbnet
+  shard1db: 
+    image: mysql:8.0
+    container_name: shard1_container
+    command: 
+    - "--default-authentication-plugin=mysql_native_password"
+    - "--local-infile=1"
+    restart: always
+    volumes: 
+      # Copy Dataset
+      - ./dataset/Posts.xml:/var/lib/mysql-files/dataset/Posts.xml
+      # Run SQL file on init
+      - ./database/shard1.sql:/docker-entrypoint-initdb.d/0_init.sql
+      # Persist data
+      - $HOME/databaseS1:/var/lib/mysql
+    ports:
+      - 4001:4001
+    environment:
+      MYSQL_DATABASE: shard1db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_TCP_PORT: 4001
+      SERVICE_NAME: shard1db
+    networks:
+      - dbnet
+  shard2db: 
+    image: mysql:8.0
+    container_name: shard2_container
+    command: 
+    - "--default-authentication-plugin=mysql_native_password"
+    - "--local-infile=1"
+    restart: always
+    volumes: 
+      # Copy Dataset
+      - ./dataset/Posts.xml:/var/lib/mysql-files/dataset/Posts.xml
+      # Run SQL file on init
+      - ./database/shard2.sql:/docker-entrypoint-initdb.d/0_init.sql
+      # Persist data
+      - $HOME/databaseS2:/var/lib/mysql
+    ports:
+      - 4002:4002
+    environment:
+      MYSQL_DATABASE: shard2db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_TCP_PORT: 4002
+      SERVICE_NAME: shard2db
+    networks:
+      - dbnet
+      
+  # nodeapp:
+  #   container_name: nodecontainer
+  #   build: .
+  #   ports:
+  #     - '5000:5000'
+  #   expose:
+  #     - 5000
+  #   volumes:
+  #     - $HOME/nodeapp:/app
+  #   environment:
+  #     PRIMARYDB_HOST: dbnet
+  #     PRIMARYDB_PORT: 3306
+  #     PRIMARYDB_NAME: 'primarydb'
+  #     SHARD0_HOST: dbnet
+  #     SHARD0_PORT: 4000
+  #     SHARD0_NAME: 'shard0db'
+  #     SHARD1_HOST: dbnet
+  #     SHARD1_PORT: 4001
+  #     SHARD1_NAME: 'shard1db'
+  #     SHARD2_HOST: dbnet
+  #     SHARD2_PORT: 4002
+  #     SHARD2_NAME: 'shard2db'
+  #     SERVICE_NAME: nodeapp
+  #   depends_on:
+  #     - primarydb
+  #     - shard0db
+  #     - shard1db
+  #     - shard2db
+  #   networks:
+  #     - dbnet
+networks:
+  dbnet:
+    driver: bridge
