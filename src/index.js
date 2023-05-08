@@ -52,33 +52,37 @@ const shard2 = mysql.createPool({
 
 
 app.get('/selectKey', async(req, res) =>{
-    console.log(process.env.PRIMARYDB_HOST, process.env.PRIMARYDB_PORT, process.env.PRIMARYDB_NAME)
+    // console.log(process.env.PRIMARYDB_HOST, process.env.PRIMARYDB_PORT, process.env.PRIMARYDB_NAME)
     let res_o = Object();
     let time = new Date().getTime();
     if(req.body.mode == "P"){
         primary.execute(req.body.query, function(err, result){
             if(err) throw err;
             res_o.t = new Date().getTime() - time;
-            res.send(res_o);
+            res.send(res_o)
         })
     }
     else{
+        let res_o = Object();
         if(req.body.key % 3 == 0){
             shard0.execute(req.body.query, function(err, result){
                 if(err) throw err;
-                res.send(new Date().getTime() - time);
+                res_o.t = new Date().getTime() - time;
+                res.send(res_o)
             })
         }
         else if(req.body.key % 3 == 1){
             shard1.execute(req.body.query, function(err, result){
                 if(err) throw err;
-                res.send(new Date().getTime() - time);
+                res_o.t = new Date().getTime() - time;
+                res.send(res_o)
             })
         }
         else{
             shard2.execute(req.body.query, function(err, result){
                 if(err) throw err;
-                res.send(new Date().getTime() - time);
+                res_o.t = new Date().getTime() - time;
+                res.send(res_o)
             })
         }
     }

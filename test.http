@@ -3,7 +3,7 @@
 
 # query=SELECT * FROM posts
 
-GET http://localhost:5000/selectKey HTTP/1.1
+GET http://localhost:5000/select HTTP/1.1
 content-type: application/x-www-form-urlencoded
 
-query=SELECT * FROM posts&mode=s
+query=SELECT * FROM posts&mode=P&key=1
